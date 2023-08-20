@@ -1,16 +1,11 @@
 package com.example.booklibrary.entity;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.util.Set;
 
 @Entity
-@JsonIdentityInfo(
-        generator = ObjectIdGenerators.PropertyGenerator.class,
-        property = "id"
-)
 public class Author {
 
     @Id
@@ -20,6 +15,7 @@ public class Author {
     private String name;
 
     @OneToMany(mappedBy = "author")
+    @JsonBackReference
     private Set<Book> books;
 
     public Integer getId() {

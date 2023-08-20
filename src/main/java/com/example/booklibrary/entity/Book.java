@@ -1,14 +1,9 @@
 package com.example.booklibrary.entity;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 @Entity
-@JsonIdentityInfo(
-        generator = ObjectIdGenerators.PropertyGenerator.class,
-        property = "id"
-)
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -20,6 +15,7 @@ public class Book {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "author_id", nullable = false)
+    @JsonManagedReference
     private Author author;
 
     public Integer getId() {
