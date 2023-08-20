@@ -6,6 +6,8 @@ import com.example.booklibrary.form.BookForm;
 import com.example.booklibrary.repository.AuthorRepository;
 import com.example.booklibrary.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +28,7 @@ public class BookController {
     }
 
     @PostMapping(path = "/")
-    public @ResponseBody String addNewBook(@RequestBody BookForm bookForm) {
+    public @ResponseBody ResponseEntity<HttpStatus> addNewBook(@RequestBody BookForm bookForm) {
         Book b = new Book();
         Author author;
         b.setName(bookForm.getName());
@@ -37,9 +39,9 @@ public class BookController {
             author = authorResult.get();
             b.setAuthor(author);
         } else {
-            return "Invalid Author Provided";
+            return ResponseEntity.badRequest().body(HttpStatus.BAD_REQUEST);
         }
         bookRepository.save(b);
-        return "Saved";
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 }

@@ -21,7 +21,7 @@ public class AuthorController {
     }
 
     @PostMapping(path = "/")
-    public @ResponseBody ResponseEntity addNewAuthor(@RequestBody AuthorForm authorForm) {
+    public @ResponseBody ResponseEntity<HttpStatus> addNewAuthor(@RequestBody AuthorForm authorForm) {
         Author a = new Author();
         a.setName(authorForm.getName());
         authorRepository.save(a);
