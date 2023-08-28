@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.Optional;
 
 @Controller
@@ -28,20 +29,44 @@ public class BookController {
     }
 
     @PostMapping(path = "/")
-    public @ResponseBody ResponseEntity<HttpStatus> addNewBook(@RequestBody BookForm bookForm) {
+    public @ResponseBody ResponseEntity addNewBook(@RequestBody BookForm bookForm) {
         Book b = new Book();
-        Author author;
         b.setName(bookForm.getName());
         b.setRent(bookForm.getRent());
 
         Optional<Author> authorResult = authorRepository.findById(bookForm.getAuthorId());
-        if (authorResult.isPresent()) {
-            author = authorResult.get();
-            b.setAuthor(author);
-        } else {
-            return ResponseEntity.badRequest().body(HttpStatus.BAD_REQUEST);
-        }
-        bookRepository.save(b);
-        return ResponseEntity.ok(HttpStatus.OK);
+
+        if (authorResult.isPresent()) b.setAuthor(authorResult.get());
+        else return ResponseEntity.badRequest().body(HttpStatus.BAD_REQUEST);
+
+        Book book = bookRepository.save(b);
+        return ResponseEntity.created(URI.create(String.format("/books/%d", book.getId()))).build();
+    }
+
+    @GetMapping(path = "/{bookId}")
+    public @ResponseBody ResponseEntity getBook(@RequestPart Integer bookId) {
+        Optional<Book> optionalBook = bookRepository.findById(bookId);
+
+        if (optionalBook.isPresent()) return ResponseEntity.ok(optionalBook.get());
+        else return ResponseEntity.notFound().build();
+    }
+
+    @PutMapping(path = "/{bookId}")
+    public @ResponseBody ResponseEntity updateBook(@RequestPart Integer bookId, @RequestBody BookForm bookForm) {
+        Book book;
+        Optional<Book> optionalBook = bookRepository.findById(bookId);
+
+        if (optionalBook.isPresent()) book = optionalBook.get();
+        else return ResponseEntity.notFound().build();
+
+        String name = bookForm.getName();
+        Integer rent = bookForm.getRent();
+        Optional<Author> author = authorRepository.findById(bookForm.getAuthorId());
+
+        if (name != null) book.setName(name);
+        if (rent != null) book.setRent(rent);
+        author.ifPresent(book::setAuthor);
+
+        return ResponseEntity.ok(HttpStatus.ACCEPTED);
     }
 }

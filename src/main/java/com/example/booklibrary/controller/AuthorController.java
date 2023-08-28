@@ -9,6 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
+import java.util.Optional;
+
 @Controller
 @RequestMapping(path = "/authors")
 public class AuthorController {
@@ -24,7 +27,30 @@ public class AuthorController {
     public @ResponseBody ResponseEntity<HttpStatus> addNewAuthor(@RequestBody AuthorForm authorForm) {
         Author a = new Author();
         a.setName(authorForm.getName());
-        authorRepository.save(a);
-        return ResponseEntity.ok(HttpStatus.OK);
+        Author author = authorRepository.save(a);
+        return ResponseEntity.created(URI.create(String.format("/authors/%d", author.getId()))).build();
+    }
+
+    @GetMapping(path = "/{authorId}")
+    public @ResponseBody ResponseEntity getAuthor(@RequestPart Integer authorId) {
+        Optional<Author> optionalAuthor = authorRepository.findById(authorId);
+
+        if (optionalAuthor.isPresent()) return ResponseEntity.ok(optionalAuthor.get());
+        else return ResponseEntity.notFound().build();
+    }
+
+    @PutMapping(path = "/{authorId}")
+    public @ResponseBody ResponseEntity updateAuthor(@RequestPart Integer authorId,
+                                                     @RequestBody AuthorForm authorForm) {
+        Author author = null;
+        Optional<Author> optionalAuthor = authorRepository.findById(authorId);
+
+        if (optionalAuthor.isPresent()) author = optionalAuthor.get();
+        else return ResponseEntity.notFound().build();
+
+        String name = authorForm.getName();
+        if (name != null) author.setName(name);
+
+        return ResponseEntity.ok(HttpStatus.ACCEPTED);
     }
 }
