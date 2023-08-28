@@ -44,7 +44,7 @@ public class BookController {
     }
 
     @GetMapping(path = "/{bookId}")
-    public @ResponseBody ResponseEntity getBook(@RequestPart Integer bookId) {
+    public @ResponseBody ResponseEntity getBook(@PathVariable Integer bookId) {
         Optional<Book> optionalBook = bookRepository.findById(bookId);
 
         if (optionalBook.isPresent()) return ResponseEntity.ok(optionalBook.get());
@@ -52,7 +52,7 @@ public class BookController {
     }
 
     @PutMapping(path = "/{bookId}")
-    public @ResponseBody ResponseEntity updateBook(@RequestPart Integer bookId, @RequestBody BookForm bookForm) {
+    public @ResponseBody ResponseEntity updateBook(@PathVariable Integer bookId, @RequestBody BookForm bookForm) {
         Book book;
         Optional<Book> optionalBook = bookRepository.findById(bookId);
 
@@ -61,7 +61,9 @@ public class BookController {
 
         String name = bookForm.getName();
         Integer rent = bookForm.getRent();
-        Optional<Author> author = authorRepository.findById(bookForm.getAuthorId());
+        Integer authorId = bookForm.getAuthorId();
+        Optional<Author> author = (authorId != null) ? authorRepository.findById(bookForm.getAuthorId())
+                : Optional.empty();
 
         if (name != null) book.setName(name);
         if (rent != null) book.setRent(rent);

@@ -32,7 +32,7 @@ public class AuthorController {
     }
 
     @GetMapping(path = "/{authorId}")
-    public @ResponseBody ResponseEntity getAuthor(@RequestPart Integer authorId) {
+    public @ResponseBody ResponseEntity getAuthor(@PathVariable Integer authorId) {
         Optional<Author> optionalAuthor = authorRepository.findById(authorId);
 
         if (optionalAuthor.isPresent()) return ResponseEntity.ok(optionalAuthor.get());
@@ -40,7 +40,7 @@ public class AuthorController {
     }
 
     @PutMapping(path = "/{authorId}")
-    public @ResponseBody ResponseEntity updateAuthor(@RequestPart Integer authorId,
+    public @ResponseBody ResponseEntity updateAuthor(@PathVariable Integer authorId,
                                                      @RequestBody AuthorForm authorForm) {
         Author author = null;
         Optional<Author> optionalAuthor = authorRepository.findById(authorId);
