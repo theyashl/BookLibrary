@@ -3,7 +3,6 @@ package com.example.booklibrary.controller;
 import com.example.booklibrary.entity.Author;
 import com.example.booklibrary.form.AuthorForm;
 import com.example.booklibrary.repository.AuthorRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -15,8 +14,11 @@ import java.util.Optional;
 @Controller
 @RequestMapping(path = "/authors")
 public class AuthorController {
-    @Autowired
-    private AuthorRepository authorRepository;
+    private final AuthorRepository authorRepository;
+
+    public AuthorController(AuthorRepository authorRepository) {
+        this.authorRepository = authorRepository;
+    }
 
     @GetMapping(path = "/")
     public @ResponseBody Iterable<Author> getAllAuthors() {
@@ -32,7 +34,7 @@ public class AuthorController {
     }
 
     @GetMapping(path = "/{authorId}")
-    public @ResponseBody ResponseEntity getAuthor(@PathVariable Integer authorId) {
+    public @ResponseBody ResponseEntity<?> getAuthor(@PathVariable Integer authorId) {
         Optional<Author> optionalAuthor = authorRepository.findById(authorId);
 
         if (optionalAuthor.isPresent()) return ResponseEntity.ok(optionalAuthor.get());
@@ -40,9 +42,9 @@ public class AuthorController {
     }
 
     @PutMapping(path = "/{authorId}")
-    public @ResponseBody ResponseEntity updateAuthor(@PathVariable Integer authorId,
+    public @ResponseBody ResponseEntity<?> updateAuthor(@PathVariable Integer authorId,
                                                      @RequestBody AuthorForm authorForm) {
-        Author author = null;
+        Author author;
         Optional<Author> optionalAuthor = authorRepository.findById(authorId);
 
         if (optionalAuthor.isPresent()) author = optionalAuthor.get();

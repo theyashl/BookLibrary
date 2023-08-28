@@ -5,7 +5,6 @@ import com.example.booklibrary.entity.Book;
 import com.example.booklibrary.form.BookForm;
 import com.example.booklibrary.repository.AuthorRepository;
 import com.example.booklibrary.repository.BookRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -17,11 +16,13 @@ import java.util.Optional;
 @Controller
 @RequestMapping(path = "/books")
 public class BookController {
-    @Autowired
-    private BookRepository bookRepository;
+    private final BookRepository bookRepository;
+    private final AuthorRepository authorRepository;
 
-    @Autowired
-    private AuthorRepository authorRepository;
+    public BookController(BookRepository bookRepository, AuthorRepository authorRepository) {
+        this.bookRepository = bookRepository;
+        this.authorRepository = authorRepository;
+    }
 
     @GetMapping(path = "/")
     public @ResponseBody Iterable<Book> getAllBooks() {
@@ -29,7 +30,7 @@ public class BookController {
     }
 
     @PostMapping(path = "/")
-    public @ResponseBody ResponseEntity addNewBook(@RequestBody BookForm bookForm) {
+    public @ResponseBody ResponseEntity<?> addNewBook(@RequestBody BookForm bookForm) {
         Book b = new Book();
         b.setName(bookForm.getName());
         b.setRent(bookForm.getRent());
@@ -44,7 +45,7 @@ public class BookController {
     }
 
     @GetMapping(path = "/{bookId}")
-    public @ResponseBody ResponseEntity getBook(@PathVariable Integer bookId) {
+    public @ResponseBody ResponseEntity<?> getBook(@PathVariable Integer bookId) {
         Optional<Book> optionalBook = bookRepository.findById(bookId);
 
         if (optionalBook.isPresent()) return ResponseEntity.ok(optionalBook.get());
@@ -52,7 +53,7 @@ public class BookController {
     }
 
     @PutMapping(path = "/{bookId}")
-    public @ResponseBody ResponseEntity updateBook(@PathVariable Integer bookId, @RequestBody BookForm bookForm) {
+    public @ResponseBody ResponseEntity<?> updateBook(@PathVariable Integer bookId, @RequestBody BookForm bookForm) {
         Book book;
         Optional<Book> optionalBook = bookRepository.findById(bookId);
 
